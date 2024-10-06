@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
-const User = require('../models/User'); // Adjust the path if necessary
+const User = require('../models/User');
 
 const verifyToken = promisify(jwt.verify);
 
@@ -14,7 +14,7 @@ const authMiddleware = async (req, res, next) => {
 
     const decoded = await verifyToken(token, process.env.JWT_SECRET);
 
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.user.id);
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid token' });

@@ -1,0 +1,26 @@
+.car-listing {
+    padding: 20px;
+  }
+  
+  .car-listing h2 {
+    text-align: center;
+  }
+  
+  .car-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  
+  .car-listing ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .car-listing li {
+    background-color: #f4f4f4;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+  }
+  

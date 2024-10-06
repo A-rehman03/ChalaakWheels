@@ -1,6 +1,6 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
 // Register a new user
 const registerUser = async (req, res) => {
@@ -81,6 +81,7 @@ const loginUser = async (req, res) => {
         res.json({ token });
       }
     );
+    
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
