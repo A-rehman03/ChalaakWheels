@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 
 // Register a new user
 const registerUser = async (req, res) => {
+  console.log("Request received:", req.body);  // Log request body
   const { name, email, password } = req.body;
 
   try {
@@ -26,6 +27,15 @@ const registerUser = async (req, res) => {
 
     await user.save();
 
+    // Generate and send OTP
+    const otp = generateOTP();
+    await sendEmail(email, otp);
+    
+    // Store OTP in the user document or in-memory storage (for simplicity)
+    user.otp = otp;
+    await user.save();
+    res.status(200).json({ message: 'User registered, OTP sent to email' });
+    
     // Return JWT
     const payload = {
       user: {
@@ -42,9 +52,31 @@ const registerUser = async (req, res) => {
         res.json({ token });
       }
     );
-  } catch (err) {
+  } 
+  catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ msg: 'Server error' });  // Return error as JSON
+  }
+};
+
+// OTP verification route
+const verifyOTP = async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+      const user = await User.findOne({ email });
+      if (!user || user.otp !== otp) {
+          return res.status(400).json({ msg: 'Invalid OTP' });
+      }
+
+      // OTP is valid, clear it or handle accordingly
+      user.otp = undefined; // Clear the OTP
+      await user.save();
+
+      res.status(200).json({ message: 'OTP verified, login successful' });
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
   }
 };
 
@@ -65,6 +97,16 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
+    const otp = generateOTP();
+        await sendEmail(email, otp);
+        
+        // Store OTP in the user document or in-memory storage (for simplicity)
+        user.otp = otp;
+        await user.save();
+
+        res.status(200).json({ message: 'Login successful, OTP sent to email' });
+
+
     // Return JWT
     const payload = {
       user: {
@@ -84,11 +126,12 @@ const loginUser = async (req, res) => {
     
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ msg: 'Server error' });
   }
 };
 
 module.exports = {
   registerUser,
+  verifyOTP,
   loginUser,
 };

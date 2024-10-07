@@ -8,7 +8,7 @@ const carListings = [
         id: 1,
         model: '2022 Tesla Model S',
         price: '$79,990',
-        image: '../images/car1.jpg', // Replace with actual image paths
+        image: '/src/images/car1.jpg', // Replace with actual image paths
     },
     {
         id: 2,
@@ -29,9 +29,12 @@ const Home = () => {
     return (
         <div className="home-container">
             <h1>Welcome to ChalakWheels</h1>
-            <h2>Your Dream Car Awaits</h2>
+            <h2> Where Your Dream Car Awaits</h2>
             <Link to="/register">
                 <button className="button">Join Us Now!</button>
+            </Link>
+            <Link to="/login">
+                <button className="button">click if already registered!</button>
             </Link>
 
             <div className="car-listings">

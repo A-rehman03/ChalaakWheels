@@ -1,4 +1,5 @@
 .car-card {
+    background-image: url('/src/images/car1.jpg'); /* Ensure this path is correct */
     background-color: #f8f9fa;
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

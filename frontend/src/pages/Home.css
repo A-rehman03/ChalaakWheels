@@ -1,6 +1,6 @@
 /* Overall home container */
 .home-container {
-    background-image: url('../images/home-bg.jpg'); /* Ensure this path is correct */
+    background-image: url('/src/images/home-bg.jpg'); /* Ensure this path is correct */
     background-size: cover;
     background-position: center;
     display: flex;
@@ -18,6 +18,7 @@
 h1 {
     font-size: 4rem; /* Large heading for the home page */
     margin-bottom: 20px;
+    transition: all 1s fade-in, height 0ms;
 }
 
 /* Subheading styles */
@@ -25,10 +26,19 @@ h2 {
     font-size: 2.5rem; /* Medium heading for the home page */
     margin-bottom: 40px;
 }
+@keyframes example {
+    from {background-color: rgb(237, 204, 204);}
+    to {background-color: rgb(26, 29, 54);}
+  }
+div {
+    background-color: rgb(14, 39, 67);
+    animation-name: example;
+    animation-duration: 4s;
+  }  
 
 /* Button styles */
 .button {
-    padding: 15px 30px;
+    padding: 25px 30px;
     background: rgba(40, 167, 69, 0.8); /* Semi-transparent button background */
     border: none;
     border-radius: 5px;
@@ -37,7 +47,6 @@ h2 {
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease; /* Button hover effect */
 }
-
 /* Button hover effect */
 .button:hover {
     background: rgba(40, 167, 69, 1); /* Solid color on hover */

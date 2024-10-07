@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CarListing from './pages/CarListing';
+import OTP from './pages/OTP';
 import Footer from './components/Footer'; // Assuming you have a Footer component
 
 function App() {
