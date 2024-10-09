@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import { useNavigate } from 'react-router-dom';
 import './Register.css';
 
 const Register = () => {
     const [name, setName] = useState('');
-    const [error, setError] = useState(null); // State for error messages
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigate = useNavigate(); // Initialize useNavigate
-    
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:5000/api/register', { // Use your API URL
+            const response = await fetch('http://localhost:5000/api/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -22,24 +22,28 @@ const Register = () => {
             });
 
             const data = await response.json();
+
             if (response.ok) {
-                console.log('Registration successful:', data);
-                navigate('/verify-otp');
+                // Navigate to OTP verification page
+                navigate('/verify-otp', { state: { email } }); // Pass email for OTP verification
             } else {
-                setError(data.message || 'Registration failed');// Optionally, handle error messages here
+                console.error('Registration failed:', data);
+                setError(data.message || 'Registration failed');
             }
         } catch (error) {
             console.error('Error:', error);
+            setError('An error occurred. Please try again.');
         }
     };
 
     return (
         <div className="register-container">
-            <h2>Create Account</h2>
+            <h2>Register</h2>
+            {error && <p className="error-message">{error}</p>}
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
-                    placeholder="Username"
+                    placeholder="Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required

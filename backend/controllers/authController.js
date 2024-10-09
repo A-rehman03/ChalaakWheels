@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const generateOTP = require('../utils/generateOTP'); // Your OTP generator
+const sendEmail = require('../utils/sendEmail'); 
 
 // Register a new user
 const registerUser = async (req, res) => {
@@ -18,44 +20,26 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
+    // Generate OTP and save new user with OTP
+    const otp = generateOTP();
     user = new User({
       name,
       email,
       password: hashedPassword,
+      otp,  // Store generated OTP
+      otpExpiry: Date.now() + 10 * 60 * 1000, // OTP valid for 10 minutes
     });
 
     await user.save();
 
-    // Generate and send OTP
-    const otp = generateOTP();
+    // Send OTP via email
     await sendEmail(email, otp);
-    
-    // Store OTP in the user document or in-memory storage (for simplicity)
-    user.otp = otp;
-    await user.save();
+  
     res.status(200).json({ message: 'User registered, OTP sent to email' });
     
-    // Return JWT
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
-  } 
-  catch (err) {
+  } catch (err) {
     console.error(err.message);
-    res.status(500).json({ msg: 'Server error' });  // Return error as JSON
+    res.status(500).json({ msg: 'Server error' });
   }
 };
 
@@ -64,66 +48,83 @@ const verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
 
   try {
-      const user = await User.findOne({ email });
-      if (!user || user.otp !== otp) {
-          return res.status(400).json({ msg: 'Invalid OTP' });
-      }
+    // Find user by email and verify OTP
+    const user = await User.findOne({ email });
+    if (!user || user.otp !== otp) {
+      return res.status(400).json({ msg: 'Invalid OTP' });
+    }
 
-      // OTP is valid, clear it or handle accordingly
-      user.otp = undefined; // Clear the OTP
-      await user.save();
+    // OTP is valid, clear the OTP
+    user.otp = undefined;
+    user.otpExpiry = undefined;  // Remove OTP expiry after verification
+    await user.save();
 
-      res.status(200).json({ message: 'OTP verified, login successful' });
+    res.status(200).json({ message: 'OTP verified successfully' });
   } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
+    console.error(err.message);
+    res.status(500).json({ msg: 'Server error' });
   }
 };
 
 // Login user
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, otp } = req.body;
 
   try {
-    // Check if user exists
-    let user = await User.findOne({ email });
+    // Find the user by email
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
-    // Compare passwords
+    // Check if password matches
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
+    // Validate OTP
+    if (user.otp !== otp || Date.now() > user.otpExpiry) {
+      return res.status(400).json({ msg: 'Invalid or expired OTP' });
+    }
+
+    // Clear OTP and generate JWT after successful login
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+    await user.save();
+
+    const payload = { user: { id: user.id } };
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+      if (err) throw err;
+      res.json({ token });
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// Resend OTP
+const resendOTP = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    // Generate a new OTP and update the user
     const otp = generateOTP();
-        await sendEmail(email, otp);
-        
-        // Store OTP in the user document or in-memory storage (for simplicity)
-        user.otp = otp;
-        await user.save();
+    user.otp = otp;
+    user.otpExpiry = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
 
-        res.status(200).json({ message: 'Login successful, OTP sent to email' });
+    await user.save();
 
+    // Send new OTP via email
+    await sendEmail(email, otp);
 
-    // Return JWT
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
-
-    jwt.sign(
-      payload,
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' },
-      (err, token) => {
-        if (err) throw err;
-        res.json({ token });
-      }
-    );
-    
+    res.status(200).json({ msg: 'OTP resent to your email' });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ msg: 'Server error' });
@@ -134,4 +135,5 @@ module.exports = {
   registerUser,
   verifyOTP,
   loginUser,
+  resendOTP,
 };

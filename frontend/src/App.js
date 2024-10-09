@@ -16,6 +16,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/cars" element={<CarListing />} />
+                    <Route path="/verify-otp" element={<OTP />} />
                 </Routes>
                 <Footer />
             </div>
