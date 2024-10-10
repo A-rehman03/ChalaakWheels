@@ -43,30 +43,37 @@ const registerUser = async (req, res) => {
   }
 };
 
-// OTP verification route
 const verifyOTP = async (req, res) => {
-  const { email, otp } = req.body;
+  const { otp } = req.body; // Only take OTP from the request
+
+  if (!otp) {
+    return res.status(400).json({ msg: 'OTP is required' });
+  }
 
   try {
-    // Find user by email and verify OTP
-    const user = await User.findOne({ email });
-    if (!user || user.otp !== otp) {
+    // Assuming the user is already identified by session or JWT
+    // This could be replaced with another method of identifying the user
+    const user = await User.findOne({ otp }); // Find user by OTP directly
+
+    if (!user) {
       return res.status(400).json({ msg: 'Invalid OTP' });
     }
 
-    // OTP is valid, clear the OTP
+    if (Date.now() > user.otpExpiry) {
+      return res.status(400).json({ msg: 'OTP has expired' });
+    }
+
+    // OTP is valid, clear OTP and respond success
     user.otp = undefined;
-    user.otpExpiry = undefined;  // Remove OTP expiry after verification
+    user.otpExpiry = undefined;
     await user.save();
 
     res.status(200).json({ message: 'OTP verified successfully' });
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).send('Server error');
   }
 };
-
-// Login user
 const loginUser = async (req, res) => {
   const { email, password, otp } = req.body;
 

@@ -1,52 +1,42 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './OTP.css'; // Create a corresponding CSS file for styling
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import './OTP.css';
 
 const OTP = () => {
-    const [otp, setOtp] = useState('');
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+  const [otp, setOtp] = useState('');
+  const navigate = useNavigate(); // Initialize useNavigate
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({email, otp }),
-            });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-            const data = await response.json();
-            if (response.ok) {
-                console.log('OTP verified:', data);
-                // Redirect to home or another page after successful verification
-                navigate('/'); 
-            } else {
-                setError(data.message || 'OTP verification failed');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
+    try {
+      const response = await axios.post('http://localhost:5000/api/auth/verify-otp', { otp });
+      alert(response.data.message);
+      
+      // Redirect to login page after successful OTP verification
+      navigate('/login'); // Replace '/login' with your actual login route
+      
+    } catch (error) {
+      console.error(error.response.data);
+      alert(error.response.data.msg);
+    }
+  };
 
-    return (
-        <div className="otp-container">
-            <h2>Enter OTP</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Enter OTP"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    required
-                />
-                <button type="submit">Verify OTP</button>
-                {error && <p className="error-message">{error}</p>}
-            </form>
-        </div>
-    );
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        Enter OTP:
+        <input
+          type="text"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          required
+        />
+      </label>
+      <button type="submit">Verify OTP</button>
+    </form>
+  );
 };
 
 export default OTP;
