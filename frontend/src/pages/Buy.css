@@ -1,0 +1,65 @@
+/* Buy.css */
+
+.container {
+    padding: 20px;
+    background-color: #f4f4f9;
+  }
+  
+  .filter-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .filter-section select,
+  .filter-section input {
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .car-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .car-item {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .car-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .car-item h3 {
+    font-size: 1.5rem;
+    margin: 10px 0;
+  }
+  
+  .car-item p {
+    color: #555;
+    margin-bottom: 10px;
+  }
+  
+  .car-item button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .car-item button:hover {
+    background-color: #45a049;
+  }
+      

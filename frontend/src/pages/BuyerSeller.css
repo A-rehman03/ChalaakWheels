@@ -1,0 +1,53 @@
+/* BuyerSeller.css */
+
+.container {
+    display: -ms-flexbox;
+    justify-content: center;
+    align-items: center;
+    padding: auto;
+    height: auto;
+    background-color: #f4f4f9;
+    flex-direction: row;
+  }
+  
+  h2 {
+    margin-bottom: 20px;
+    font-size: 2rem;
+    color: #e0d3d3;
+    
+  }
+  
+  .button-container {
+    display: flex;
+    gap: 20px;
+  }
+  
+  button {
+    padding: 15px 30px;
+    margin-left: 20px;
+    margin: 10px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button.buy {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  button.buy:hover {
+    background-color: #45a049;
+  }
+  
+  button.sell {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  button.sell:hover {
+    background-color: #e53935;
+  }
+  
