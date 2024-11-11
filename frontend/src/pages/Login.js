@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
 
 const Login = () => {
@@ -23,35 +23,47 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('token', data.token); // Save JWT token
-        navigate('/buyer-seller'); // Redirect to home page after login
+        // Save JWT token in local storage
+        localStorage.setItem('authToken', data.token); // Use 'authToken' for consistency
+
+        // Redirect to the Buyer/Seller page after successful login
+        navigate('/buyer-seller');
       } else {
-        setError(data.message || 'Login failed');
+        setError(data.message || 'Login failed. Please check your credentials.');
       }
     } catch (error) {
-      setError('Error during login.');
+      console.error(error); // Log the error for debugging
+      setError('Error during login. Please try again.');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <button type="submit">Login</button>
-      {error && <p>{error}</p>}
-    </form>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2>Welcome Back to ChalakWheels</h2>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit">Log In</button>
+        </form>
+        {error && <p className="error-message">{error}</p>} {/* Display error message if present */}
+        <p>
+          Don't have an account? <Link to="/register">Sign Up</Link>
+        </p>
+      </div>
+    </div>
   );
 };
 

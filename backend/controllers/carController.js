@@ -5,6 +5,12 @@ const createCar = async (req, res) => {
   try {
     const { title, model, price, location, description, images } = req.body;
 
+    const imageUrls = [];
+    if (req.files) {
+        req.files.forEach((file) => {
+            // Add logic to store file in GridFS and save URL to imageUrls array
+        });
+    }
     const newCar = new Car({
       user: req.user.id, // Get user ID from auth middleware
       title,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 import './Register.css';
 
 const Register = () => {
@@ -37,33 +37,37 @@ const Register = () => {
     };
 
     return (
-        <div className="register-container">
-            <h2>Register</h2>
-            {error && <p className="error-message">{error}</p>}
-            <form onSubmit={handleSubmit}>
+        <div className="auth-container">
+            <div className="auth-card">
+                <h2>Join ChalakWheels</h2>
+                <form onSubmit={handleSubmit} className="auth-form">
                 <input
-                    type="text"
-                    placeholder="Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                />
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit">Register</button>
-            </form>
+                        type="name"
+                        placeholder="Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    <button type="submit">Sign Up</button>
+                </form>
+                <p>
+                    Already have an account? <Link to="/login">Log In</Link>
+                </p>
+            </div>
         </div>
     );
 };
