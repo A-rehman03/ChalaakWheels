@@ -1,8 +1,30 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';  // Replace with your backend URL
+// Base URL for your backend
+const API_URL = 'http://localhost:5000/api';
 
-// Set up Axios instance with default settings
+export const createConversation = async (userId, token) => {
+  return await axios.post(
+    `${API_URL}/messages/conversations`,
+    { recipientId: userId },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+};
+
+export const getMessages = async (conversationId, token) => {
+  return await axios.get(`${API_URL}/messages/${conversationId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const sendMessage = async (conversationId, text, token) => {
+  return await axios.post(
+    `${API_URL}/messages`,
+    { conversationId, text },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+};
+
 const api = axios.create({
   baseURL: API_URL,
   headers: {

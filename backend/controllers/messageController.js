@@ -1,67 +1,44 @@
 const Message = require('../models/Message');
+const Conversation = require('../models/Conversation');
 
-// Create a new message
-const createMessage = async (req, res) => {
+// Send a message
+exports.sendMessage = async (req, res) => {
   try {
-    const { receiver, content } = req.body;
+    const { conversationId, text } = req.body;
+    const senderId = req.user._id;
+    
+    const message = await Message.create({ conversationId, senderId, text });
+    res.status(201).json(message);
+  } catch (error) {
+    console.error('Error sending message:', error);
+    res.status(500).json({ error: 'Failed to send message' });
+  }
+};
 
-    const newMessage = new Message({
-      sender: req.user.id, // Get user ID from auth middleware
-      receiver,
-      content,
+// Get messages for a conversation
+exports.getMessages = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const messages = await Message.find({ conversationId }).populate('senderId', 'username');
+    res.json(messages);
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({ error: 'Failed to fetch messages' });
+  }
+};
+
+// Create a new conversation if one doesn't exist
+exports.createConversation = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const existingConversation = await Conversation.findOne({
+      participants: { $all: [req.user._id, userId] }
     });
 
-    const message = await newMessage.save();
-    res.json(message);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    const conversation = existingConversation || await Conversation.create({ participants: [req.user._id, userId] });
+    res.status(201).json(conversation);
+  } catch (error) {
+    console.error('Error creating conversation:', error);
+    res.status(500).json({ error: 'Failed to create conversation' });
   }
-};
-
-// Get messages between two users
-const getMessages = async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    const messages = await Message.find({
-      $or: [
-        { sender: req.user.id, receiver: userId },
-        { sender: userId, receiver: req.user.id }
-      ]
-    }).populate('sender', 'name').populate('receiver', 'name');
-
-    res.json(messages);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
-};
-
-// Delete a message
-const deleteMessage = async (req, res) => {
-  try {
-    const message = await Message.findById(req.params.id);
-
-    if (!message) {
-      return res.status(404).json({ msg: 'Message not found' });
-    }
-
-    // Check if the user deleting is the sender
-    if (message.sender.toString() !== req.user.id) {
-      return res.status(401).json({ msg: 'Not authorized' });
-    }
-
-    await message.remove();
-    res.json({ msg: 'Message removed' });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
-};
-
-module.exports = {
-  createMessage,
-  getMessages,
-  deleteMessage,
 };

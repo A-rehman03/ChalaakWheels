@@ -22,7 +22,7 @@ const Sell = () => {
   };
 
   const handleImageChange = (e) => {
-    setImages(Array.from(e.target.files)); // Store selected files as an array
+    setImages(Array.from(e.target.files));
   };
 
   const handleSubmit = async (e) => {
@@ -37,27 +37,21 @@ const Sell = () => {
 
     // Create FormData and append fields
     const formData = new FormData();
-    formData.append('title', carDetails.title);
-    formData.append('model', carDetails.model);
-    formData.append('price', carDetails.price);
-    formData.append('year', carDetails.year);
-    formData.append('location', carDetails.location);
-    formData.append('description', carDetails.description);
-
-    // Append each image to FormData
+    Object.keys(carDetails).forEach(key => formData.append(key, carDetails[key]));
     images.forEach((image) => formData.append('images', image));
 
     try {
       await axios.post('http://localhost:5000/api/cars', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
       });
       alert('Car listed successfully!');
       navigate('/');
     } catch (error) {
       console.error('Error:', error.response?.data || error.message);
-      setError('Failed to list the car. Please try again.');
+      setError(error.response?.data?.message || 'Failed to list the car. Please try again.');
       if (error.response?.status === 401) {
         setError('Session expired. Please log in again.');
         navigate('/login');

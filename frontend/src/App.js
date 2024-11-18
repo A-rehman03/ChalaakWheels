@@ -9,6 +9,8 @@ import Footer from './components/Footer';
 import BuyerSeller from './pages/BuyerSeller';
 import Buy from './pages/Buy';
 import Sell from './pages/Sell';
+import Message from './pages/Message';
+import Dashboard from './pages/Dashboard';
     
 function App() {
     return (
@@ -22,7 +24,9 @@ function App() {
                     <Route path="/verify-otp" element={<OTP />} />
                     <Route path="/buyer-seller" element={<BuyerSeller />} />
                     <Route path="/buy" element={<Buy />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/sell" element={<Sell />} />
+                    <Route path="/messages/:buyerId/:sellerId" element={<Message />} />
                 </Routes>
                 <Footer />
             </div>

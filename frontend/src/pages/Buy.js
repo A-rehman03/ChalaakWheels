@@ -1,12 +1,13 @@
-// Buy.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Buy.css';
 
-const Buy = () => {
+const Buy = ({ user }) => {
   const [cars, setCars] = useState([]);
   const [filters, setFilters] = useState({ price: '', model: '', location: '' });
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -14,7 +15,7 @@ const Buy = () => {
         const response = await axios.get('http://localhost:5000/api/cars');
         setCars(response.data);
       } catch (error) {
-        console.error("Error fetching cars:", error);
+        console.error('Error fetching cars:', error);
       } finally {
         setLoading(false);
       }
@@ -24,6 +25,14 @@ const Buy = () => {
 
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
+  };
+
+  const handleMessageSeller = (sellerId) => {
+    if (!user || !user._id || !sellerId) {
+      return; // Do nothing if user or seller information is unavailable
+    }
+
+    navigate(`/message/${user._id}/${sellerId}`);
   };
 
   const filteredCars = cars.filter((car) => {
@@ -78,6 +87,9 @@ const Buy = () => {
                   <h3>{car.model}</h3>
                   <p>Price: {car.price} Rs</p>
                   <p>Location: {car.location}</p>
+                  <button onClick={() => handleMessageSeller(car.sellerId)}>
+                    Message Seller
+                  </button>
                 </div>
               </div>
             ))

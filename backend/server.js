@@ -25,17 +25,24 @@ let gfs;
 mongoose.connection.once('open', () => {
     gfs = Grid(mongoose.connection.db, mongoose.mongo);
     gfs.collection('uploads');
+    console.log('GridFS connected');
 });
 
-// GridFS storage configuration
+const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/ChalakWheels';
+
+// GridFS storage configuration with error handling
 const storage = new GridFsStorage({
-    url: process.env.MONGO_URI,
-    file: (req, file) => {
-        return {
-            filename: `file_${Date.now()}_${file.originalname}`,
-            bucketName: 'uploads' // Collection name in MongoDB
-        };
-    }
+    url: mongoURI,
+    file: (req, file) => ({
+        filename: `file_${Date.now()}_${file.originalname}`,
+        bucketName: 'uploads', // Collection name in MongoDB
+    }),
+});
+storage.on('connection', (db) => {
+    console.log('Connected to GridFS for file storage.');
+});
+storage.on('error', (error) => {
+    console.error('GridFS Storage error:', error);
 });
 
 const upload = multer({ storage });
@@ -48,28 +55,29 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/cars', carRoutes);
-app.use('/api/messages', messageRoutes); // Add the messages route
+app.use('/api/messages', messageRoutes);
 
 // Route to handle file uploads to GridFS
-app.post('/api/upload', upload.single('file'), (req, res) => {
-    res.status(201).json({ fileId: req.file.id, message: 'File uploaded successfully' });
+app.post('/api/upload', upload.array('images', 5), (req, res) => {
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: 'No files uploaded' });
+    }
+    const fileIds = req.files.map(file => file.id); // Collect all file IDs
+    res.status(201).json({ fileIds, message: 'Files uploaded successfully' });
 });
 
 // Route to get an image by ID from GridFS
 app.get('/api/images/:id', async (req, res) => {
     try {
         const file = await gfs.files.findOne({ _id: mongoose.Types.ObjectId(req.params.id) });
-
         if (!file || !file.contentType.startsWith('image/')) {
             return res.status(404).json({ error: 'Image not found' });
         }
-
-        // Stream the image file from GridFS
         const readstream = gfs.createReadStream(file._id);
         res.set('Content-Type', file.contentType);
         readstream.pipe(res);
     } catch (error) {
-        console.error(error);
+        console.error('Error retrieving image:', error);
         res.status(500).json({ error: 'Failed to retrieve image' });
     }
 });
