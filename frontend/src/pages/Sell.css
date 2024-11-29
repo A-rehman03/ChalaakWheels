@@ -1,56 +1,77 @@
 /* Sell.css */
 
-body {
-  font-family: Arial, sans-serif;
-}
-
-.sell-container {
-  max-width: 500px;
+.sell-page {
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  border: 1px solid #eee;
-  border-radius: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
   background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
-  font-size: 2em;
-  color: #333;
+.sell-page h2 {
+  text-align: center;
+  font-size: 24px;
   margin-bottom: 20px;
+  color: #333;
 }
 
-form {
+.sell-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-input, textarea {
-  padding: 10px;
-  font-size: 1em;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  transition: border 0.3s ease;
-}
-
-input:focus, textarea:focus {
-  border-color: #3d85c6;
-}
-
-button {
+.sell-form input,
+.sell-form textarea {
   padding: 12px;
-  font-size: 1em;
-  color: #fff;
-  background-color: #3d85c6;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s ease;
 }
 
-button:hover {
-  background-color: #2b5f8a;
-  transform: scale(1.05);
+.sell-form input:focus,
+.sell-form textarea:focus {
+  border-color: #4CAF50;
+}
+
+.sell-form input[type="file"] {
+  padding: 8px;
+  background-color: #f0f0f0;
+}
+
+.sell-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.sell-form button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sell-form button:hover {
+  background-color: #45a049;
+}
+
+.sell-form button:focus {
+  outline: none;
+}
+
+.sell-page .error {
+  margin-top: 20px;
+  padding: 10px;
+  color: white;
+  background-color: #f44336;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
 }

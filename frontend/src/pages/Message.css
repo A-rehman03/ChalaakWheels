@@ -1,0 +1,60 @@
+.message-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #f9f9f9;
+}
+
+.message-box {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.my-message {
+  align-self: flex-end;
+  background-color: #e6ffe6;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.their-message {
+  align-self: flex-start;
+  background-color: #e6f0ff;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.message-input {
+  display: flex;
+  gap: 8px;
+}
+
+.message-input input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.message-input button {
+  padding: 10px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.message-input button:hover {
+  background-color: #0056b3;
+}

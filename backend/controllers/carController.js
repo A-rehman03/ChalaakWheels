@@ -3,29 +3,30 @@ const Car = require('../models/Car');
 // Create a new car listing
 const createCar = async (req, res) => {
   try {
-    const { title, model, price, location, description, images } = req.body;
+    const { title, model, price, year, location, description } = req.body;
+    const images = req.files ? req.files.map(file => {
+      // Convert image files to Base64
+      const imageBuffer = file.buffer;
+      const base64Image = imageBuffer.toString('base64');
+      return `data:${file.mimetype};base64,${base64Image}`;
+    }) : [];
 
-    const imageUrls = [];
-    if (req.files) {
-        req.files.forEach((file) => {
-            // Add logic to store file in GridFS and save URL to imageUrls array
-        });
-    }
     const newCar = new Car({
-      user: req.user.id, // Get user ID from auth middleware
       title,
       model,
       price,
+      year,
       location,
       description,
-      images,
+      images, // Store images as Base64 strings
+      user: req.user.id, // Assuming you're storing the user ID
     });
 
-    const car = await newCar.save();
-    res.json(car);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    await newCar.save();
+    res.status(201).json({ message: 'Car listed successfully!', car: newCar });
+  } catch (error) {
+    console.error('Error creating car listing:', error);
+    res.status(500).json({ message: 'Failed to create car listing.' });
   }
 };
 
@@ -70,12 +71,28 @@ const updateCar = async (req, res) => {
 
     const { title, model, price, location, description, images } = req.body;
 
+    if (images) {
+      // Validate images
+      if (!Array.isArray(images) || images.length === 0) {
+        return res.status(400).json({ msg: 'At least one image is required' });
+      }
+
+      const validBase64Images = images.every((img) =>
+        /^data:image\/(png|jpeg|jpg|gif);base64,/.test(img)
+      );
+
+      if (!validBase64Images) {
+        return res.status(400).json({ msg: 'Invalid image format' });
+      }
+
+      car.images = images; // Update images
+    }
+
     car.title = title || car.title;
     car.model = model || car.model;
     car.price = price || car.price;
     car.location = location || car.location;
     car.description = description || car.description;
-    car.images = images || car.images;
 
     await car.save();
     res.json(car);
@@ -84,6 +101,7 @@ const updateCar = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
 
 // Delete a car listing
 const deleteCar = async (req, res) => {
